@@ -1,9 +1,9 @@
 ﻿namespace RedisCacheApi.Models;
 
-// 👉 Modelo simple que representa un producto real.
-//    Esto sería equivalente a una tabla de base de datos.
+// Modelo q representa un producto real.
+//   sería equivalente a una tabla de base de datos.
 public class Producto
 {
-    public int Id { get; set; }        // 👉 Identificador único
-    public string Nombre { get; set; } // 👉 Nombre del producto
+    public int Id { get; set; }       
+    public string Nombre { get; set; } 
 }
