@@ -9,7 +9,7 @@ public class ProductoController : ControllerBase
 {
     private readonly IProductoService _service;
 
-    // 👉 Inyección de dependencias del servicio REAL o del DECORATOR (según Program.cs)
+    //  DI del servicio REAL o del decorator según Program.cs
     public ProductoController(IProductoService service)
     {
         _service = service;
