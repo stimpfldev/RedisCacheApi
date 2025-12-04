@@ -5,46 +5,46 @@ using System.Text.Json;
 
 namespace RedisCacheApi.Services.Decorators;
 
-// 👉 Este DECORATOR envuelve a IProductoService y agrega CACHÉ REDIS.
-//    Redis = caché distribuido (ideal para load balancing y microservicios)
+//   DECORATOR q envuelve a IProductoService y agrega CACHÉ REDIS.
+
 
 public class ProductoRedisCacheDecorator : IProductoService
 {
-    private readonly IProductoService _inner;            // 👉 Service REAL (sin cache)
-    private readonly IDatabase _redis;                   // 👉 Base de datos de Redis
+    private readonly IProductoService _inner;           
+    private readonly IDatabase _redis;                   
 
     public ProductoRedisCacheDecorator(
         IProductoService inner,
         IConnectionMultiplexer connection)
     {
         _inner = inner;
-        _redis = connection.GetDatabase();               // 👉 Creamos una DB de Redis
+        _redis = connection.GetDatabase();              
     }
 
     // ================================================
-    // GET ALL (cacheado en Redis)
+    // GET ALL cacheado en Redis
     // ================================================
     public List<Producto> GetAll()
     {
         var key = "productos_todos";
 
-        // 👉 1) Intentamos leer desde Redis
+      ///  Intentamos leer desde Redis
         var valor = _redis.StringGet(key);
 
         if (!valor.IsNullOrEmpty)
         {
-            Console.WriteLine("👉 GetAll desde REDIS (decorator)");
+            Console.WriteLine(" GetAll desde REDIS (decorator)");
 
-            // 👉 Redis solo guarda STRINGS -> deserializamos JSON
+            //  Redis solo guarda STRINGS -> deserializamos JSON
             return JsonSerializer.Deserialize<List<Producto>>(valor);
         }
 
-        Console.WriteLine("⚠️ GetAll SIN cache (decorator)");
+        Console.WriteLine(" GetAll SIN cache (decorator)");
 
-        // 👉 2) Llamamos al servicio real
+        //  Llamo al servicio real
         var lista = _inner.GetAll();
 
-        // 👉 3) Guardamos en Redis como JSON
+        //  Guardo en Redis como JSON
         _redis.StringSet(
             key,
             JsonSerializer.Serialize(lista),
@@ -55,32 +55,32 @@ public class ProductoRedisCacheDecorator : IProductoService
     }
 
     // ================================================
-    // GET BY ID (cacheado en Redis)
-    // ================================================
+    // GET BY ID cacheado en Redis
+
     public Producto GetById(int id)
     {
-        // 👉 Clave única por producto
+        //  Clave única por producto
         var key = $"producto_{id}";
 
-        // 👉 1) Intentar leer desde Redis
+        //  1) Intento leer desde Redis
         var valor = _redis.StringGet(key);
 
         if (!valor.IsNullOrEmpty)
         {
-            Console.WriteLine($"👉 GetById({id}) desde REDIS (decorator)");
+            Console.WriteLine($"GetById({id}) desde REDIS (decorator)");
 
-            // 👉 Redis guarda texto → deserializamos
+            // Deserializo -> Redis guarda texto 
             return JsonSerializer.Deserialize<Producto>(valor);
         }
 
-        Console.WriteLine($"⚠️ GetById({id}) SIN cache (decorator)");
+        Console.WriteLine($" GetById({id}) SIN cache (decorator)");
 
-        // 👉 2) No está en cache → pedimos al service real
+        //  No está en cache → pido al service real
         var producto = _inner.GetById(id);
 
         if (producto != null)
         {
-            // 👉 3) Guardamos en cache con TTL
+            //  Guardo en cache con TTL
             _redis.StringSet(
                 key,
                 JsonSerializer.Serialize(producto),
@@ -99,7 +99,7 @@ public class ProductoRedisCacheDecorator : IProductoService
     {
         var nuevo = _inner.Create(nombre);
 
-        // 👉 Invalidamos caches relacionados
+        // Invalido caches relacionados
         _redis.KeyDelete("productos_todos");
         _redis.KeyDelete($"producto_{nuevo.Id}");
 
