@@ -6,7 +6,7 @@ using StackExchange.Redis;
 var builder = WebApplication.CreateBuilder(args);
 
 // ===========================================
-// 👉 REGISTRAR REDIS (Singleton, conexión global)
+//  REGISTRAR REDIS (Singleton, conexión global)
 // ===========================================
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
@@ -23,10 +23,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IProductoService, ProductoService>(); // 👉 Inyectamos el servicio REAL directamente.
 
-// 👉 Registramos el service REAL
+//  Registramos el service REAL
 builder.Services.AddSingleton<IProductoService, ProductoService>();
 
-// 👉 Decoramos el service con Redis
+//  Decoramos el service con Redis
 builder.Services.Decorate<IProductoService, ProductoRedisCacheDecorator>();
 
 
@@ -43,7 +43,7 @@ var db = redis.GetDatabase();
 db.StringSet("prueba", "Redis funcionando!");
 var valor = db.StringGet("prueba");
 
-Console.WriteLine($"🔵 Redis dice: {valor}");
+Console.WriteLine($" Redis dice: {valor}");
 
 //---- FIN PRUEBA REDIS ----//
 
