@@ -23,7 +23,7 @@ public class ProductoRedisCacheDecorator : IProductoService
 
     // ================================================
     // GET ALL cacheado en Redis
-    // ================================================
+
     public List<Producto> GetAll()
     {
         var key = "productos_todos";
@@ -75,7 +75,7 @@ public class ProductoRedisCacheDecorator : IProductoService
 
         Console.WriteLine($" GetById({id}) SIN cache (decorator)");
 
-        //  No está en cache → pido al service real
+        //  No está en cache / pido al service real
         var producto = _inner.GetById(id);
 
         if (producto != null)
